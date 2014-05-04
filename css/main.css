@@ -163,3 +163,10 @@ a:visited { color: #a0a; }
   margin-top: 20px;
 }
 
+body {
+  font-family: 'Share Tech Mono', Helvetica, Arial, sans-serif;
+}
+
+.footer {
+  font-family: Helvetica, Arial, sans-serif;
+}
