@@ -11,5 +11,5 @@ git add -A
 set +o errexit
 git ci -m "update $(date)" 2>/dev/null
 set -o errexit
-git push -u origin master
+git push origin master
 )
