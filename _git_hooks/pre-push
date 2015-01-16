@@ -1,15 +1,2 @@
 #!/usr/bin/env bash
 
-set -o errexit
-
-site=_site
-
-jekyll build --trace
-(
-cd $site
-git add -A
-set +o errexit
-git ci -m "update $(date)" 2>/dev/null
-set -o errexit
-git push origin master
-)

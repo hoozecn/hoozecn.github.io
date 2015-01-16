@@ -1,6 +1,6 @@
 name: A bite of code
 markdown: redcarpet
-pygments: true
+highlighter: rouge
 author_info:
   weibo: weibo.com/appenginelover
   github: github.com/hoozecn
