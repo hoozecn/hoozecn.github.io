@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Enable ingress nginx in TKE | 为腾讯的K8S集群启用nginx ingress - A bite of code</title>
+  <meta name="viewport" content="width=device-width">
+
+  <!-- syntax highlighting CSS -->
+  <link rel="stylesheet" href="/css/syntax.css">
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/css/main.css">
+  <script>
+    (function (i, s, o, g, r, a, m) {
+      i['GoogleAnalyticsObject'] = r;
+      i[r] = i[r] || function () {
+        (i[r].q = i[r].q || []).push(arguments)
+      }, i[r].l = 1 * new Date();
+      a = s.createElement(o),
+      m = s.getElementsByTagName(o)[0];
+      a.async = 1;
+      a.src = g;
+      m.parentNode.insertBefore(a, m)
+    })(window, document, 'script', '//www.google-analytics.com/analytics.js',
+      'ga');
+
+    ga('create', 'UA-40783779-4', 'hoozecn.github.io');
+    ga('send', 'pageview');
+  </script>
+
+</head>
+
+<body>
+
+  <div class="site">
+    <div class="header">
+      <h1 class="title"><a href="/">A bite of code</a></h1>
+      <a class="extra" href="/">home</a>
+      <a class="extra" href="/about.html">about</a>
+    </div>
+    <h2>Enable ingress nginx in TKE | 为腾讯的K8S集群启用nginx ingress</h2>
+<p class="meta">13 Jun 2019</p>
+
+<div class="post">
+  <p><a href="https://cloud.tencent.com/product/tke">腾讯云集群</a>默认不提供nginx类型的ignress，而默认的实现并不能很好的支持多ingress的泛域名解析场景, 因为每个ingress都会有独立的公网IP。</p>
+
+<p>Nginx is not the default ingress class in <a href="https://cloud.tencent.com/product/tke">TKE</a>. The default implementation doesn&#39;t support wildcard domain well, cause each ingress would have it&#39;s own public ip address. </p>
+
+<p>幸运的是nginx的ingress实现也是被腾讯云<a href="https://cloud.tencent.com/product/tke">TKE</a>支持的。</p>
+
+<p>The nginx ingress is supported by <a href="https://cloud.tencent.com/product/tke">TKE</a> as well.</p>
+
+<p>我们采用helm的方式来安装。</p>
+
+<p>We use helm to install the implementation.</p>
+
+<h3>确保helm已经安装到集群 | Make sure the helm is installed (we use aliyun mirror in China)</h3>
+
+<p><p/></p>
+<div class="highlight"><pre><code class="language-" data-lang="">helm init --upgrade --force-upgrade \
+-i registry.cn-hangzhou.aliyuncs.com/google_containers/tiller:v2.12.2
+</code></pre></div>
+<p><p/></p>
+
+<h3>clone helm-charts</h3>
+
+<p><p/></p>
+<div class="highlight"><pre><code class="language-" data-lang="">git clone --depth=1 https://github.com/helm/charts.git
+</code></pre></div>
+<p><p/></p>
+
+<h3>安装 | Install</h3>
+
+<p><p/></p>
+<div class="highlight"><pre><code class="language-" data-lang="">cd charts
+helm install --name gocloudio-nginx-ingress \
+--namespace gocloudio-nginx-ingress \
+./stable/nginx-ingress \
+--set-string controller.image.repository=quay-mirror.qiniu.com/kubernetes-ingress-controller/nginx-ingress-controller \
+--set-string controller.ingressClass=gocloudio-nginx \
+--set controller.replicaCount=4
+</code></pre></div>
+<p><strong>gocloudio-nginx是ingress class的类型，需要在声明ingress的时候指定, controller.replicaCount可以按需调整</strong></p>
+
+<p><strong>gocloudio-nginx is the name of the custom ingress class. It&#39;s the value which is used when a new ingress is declared. The value of controller.replicaCount can be adjusted</strong>
+<p/></p>
+
+<h3>配置示例 | Example</h3>
+
+<p>可以通过命令 <code>kubectl --namespace gocloudio-nginx-ingress get services -o wide</code> 获取nginx ingress的公网IP，用该ip地址添加到ingress配置里host的A记录里 就能实现访问</p>
+
+<p><strong>ingress的.metadata.annotations里必须声明 kubernetes.io/ingress.class 它的值和安装时指定的ingress class一致</strong> </p>
+
+<p><p/></p>
+<div class="highlight"><pre><code class="language-" data-lang="">apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: gocloudio-nginx
+    nginx.ingress.kubernetes.io/proxy-body-size: 100m
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+  name: pe-main
+spec:
+  rules:
+  - host: koderover-dev.app.8slan.com
+    http:
+      paths:
+      - backend:
+          serviceName: poetry-portal
+          servicePort: 80
+        path: /
+status:
+ loadBalancer: {}
+</code></pre></div>
+  <div id="disqus_thread"></div>
+</div>
+
+<script type="text/javascript">
+  /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+  var disqus_shortname = 'abiteofcode'; // required: replace example with your forum shortname
+  var disqus_identifier = disqus_shortname + '_' + '/tech/2019/06/13/enable-ingress-nginx-in-tencent-cloud.html';
+
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function() {
+   var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+   dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+   (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+   })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+  </div>
+
+  <script>
+    ga('send', 'event', 'blog', 'view', '', '/tech/2019/06/13/enable-ingress-nginx-in-tencent-cloud.html');
+  </script>
+  <link href='//fonts.googleapis.com/css?family=Share+Tech+Mono'
+  rel='stylesheet' type='text/css'>
+</body>
+
+</html>
+
