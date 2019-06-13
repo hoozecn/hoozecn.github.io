@@ -3,6 +3,7 @@ rvm:
   - 2.3.3
 cache: bundler
 before_install:
+  - gem install bundler
   - bundle install --verbose
 script:
   - bash publish.sh
