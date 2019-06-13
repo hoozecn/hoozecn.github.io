@@ -1,7 +1,7 @@
 ---
 layout: post
-title:  "Enable ingress nginx in tencent cloud | 为腾讯的K8S集群启用nginx ingress"
-date:   2019-06-13 09:40:09
+title:  "Enable ingress nginx in TKE | 为腾讯的K8S集群启用nginx ingress"
+date:   2019-06-13 00:00:00
 categories: tech
 tags: devOps kubernetes helm
 ---
@@ -18,27 +18,42 @@ The nginx ingress is supported by [TKE][TKE] as well.
 
 We use helm to install the implementation.
 
-1. 确保helm已经安装到集群 | Make sure the helm is installed (we use aliyun mirror in China)
+### 确保helm已经安装到集群 | Make sure the helm is installed (we use aliyun mirror in China)
 
-        helm init --upgrade --force-upgrade -i registry.cn-hangzhou.aliyuncs.com/google_containers/tiller:v2.12.2
-    
-2. clone helm-charts
+<p/>
 
-        git clone --depth=1 https://github.com/helm/charts.git
+    helm init --upgrade --force-upgrade \
+    -i registry.cn-hangzhou.aliyuncs.com/google_containers/tiller:v2.12.2
 
-3. 安装 | Install
+<p/>
+### clone helm-charts
+<p/>
 
-        cd charts
-        helm install --name gocloudio-nginx-ingress --namespace gocloudio-nginx-ingress ./stable/nginx-ingress --set-string controller.image.repository=quay-mirror.qiniu.com/kubernetes-ingress-controller/nginx-ingress-controller --set-string controller.ingressClass=gocloudio-nginx --set controller.replicaCount=4
+    git clone --depth=1 https://github.com/helm/charts.git
 
-**gocloudio-nginx 是ingress class的类型 需要在声明ingress的时候指定, controller.replicaCount可以按需调整**
+<p/>
+### 安装 | Install
+<p/>
+
+    cd charts
+    helm install --name gocloudio-nginx-ingress \
+    --namespace gocloudio-nginx-ingress \
+    ./stable/nginx-ingress \
+    --set-string controller.image.repository=quay-mirror.qiniu.com/kubernetes-ingress-controller/nginx-ingress-controller \
+    --set-string controller.ingressClass=gocloudio-nginx \
+    --set controller.replicaCount=4
+
+**gocloudio-nginx是ingress class的类型，需要在声明ingress的时候指定, controller.replicaCount可以按需调整**
+
 **gocloudio-nginx is the name of the custom ingress class. It's the value which is used when a new ingress is declared. The value of controller.replicaCount can be adjusted**
-
-4. 配置示例 | Example
+<p/>
+### 配置示例 | Example
 
 可以通过命令 `kubectl --namespace gocloudio-nginx-ingress get services -o wide` 获取nginx ingress的公网IP，用该ip地址添加到ingress配置里host的A记录里 就能实现访问
 
 **ingress的.metadata.annotations里必须声明 kubernetes.io/ingress.class 它的值和安装时指定的ingress class一致** 
+
+<p/>
 
     apiVersion: extensions/v1beta1
     kind: Ingress
