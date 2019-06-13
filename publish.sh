@@ -20,8 +20,6 @@ pushd _site
   pushd ..
     jekyll build
   popd
-  rm -f token
-  rm -f publish.sh
 
   git add -A
   git commit -am 'update'
