@@ -17,7 +17,7 @@ pushd _site
   git config user.name bot-travis-ci
   git config user.email bot@traivs-ci.com
   git fetch origin --depth=10
-  git co origin/master -b master
+  git checkout origin/master -b master
 
   pushd ..
     jekyll build
