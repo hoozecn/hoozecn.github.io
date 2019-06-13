@@ -3,9 +3,14 @@ set -e
 
 cd $(dirname $0)
 
+if [ -f token ]; then
+    export CI_TOKEN=$(cat token)
+fi
+
 jekyll build
 cd _site
-rm publish.sh
+rm -f token
+rm -f publish.sh
 rm -rf .git
 git init
 
