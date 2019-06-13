@@ -24,7 +24,7 @@ pushd _site
   popd
 
   git add -A
-  git commit -am 'update'
+  git commit --allow-empty -am 'update'
   git push origin master:master
   (cd .. && jekyll clean)
 popd
