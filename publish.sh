@@ -11,7 +11,7 @@ git init
 
 git remote add origin https://hoozecn:$CI_TOKEN@github.com/hoozecn/hoozecn.github.io
 git add -A
-git ci -am 'update'
+git commit -am 'update'
 git push origin -f master:master
 cd ..
 jekyll clean
