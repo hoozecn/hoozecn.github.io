@@ -14,6 +14,8 @@ pushd _site
   git init
   
   git remote add origin https://hoozecn:$CI_TOKEN@github.com/hoozecn/hoozecn.github.io
+  git config user.name bot-travis-ci
+  git config user.email bot@traivs-ci.com
   git fetch origin --depth=10
   git co origin/master -b master
 
