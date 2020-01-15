@@ -46,6 +46,9 @@ We use helm to install the implementation.
 **gocloudio-nginx是ingress class的类型，需要在声明ingress的时候指定, controller.replicaCount可以按需调整**
 
 **gocloudio-nginx is the name of the custom ingress class. It's the value which is used when a new ingress is declared. The value of controller.replicaCount can be adjusted**
+
+**这里我们使用了七牛的quay.io的mirror，解决quay.io在国内被屏蔽的问题**
+
 <p/>
 ### 配置示例 | Example
 
@@ -67,15 +70,21 @@ We use helm to install the implementation.
       name: pe-main
     spec:
       rules:
-      - host: koderover-dev.app.8slan.com
+      - host: portal.gocloudio.com
         http:
           paths:
           - backend:
-              serviceName: poetry-portal
+              serviceName: portal
               servicePort: 80
             path: /
     status:
      loadBalancer: {}
-    
 
+### Update (2020-01-15)
+
+在使用 [helm3] 的情况下，不必再安装tiller.
+
+Tiller is not required anymore for [helm3].
+
+[[helm3]: https://helm.sh/blog/helm-3-released/
 [TKE]: https://cloud.tencent.com/product/tke
