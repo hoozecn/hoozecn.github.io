@@ -8,3 +8,5 @@ author_info:
   google_plus: plus.google.com/+ZhiminWu
   stackoverflow: https://stackoverflow.com/users/965002/hoozecn
 exclude: [token, publish.sh, Gemfile, Gemfile.lock, vendor]
+plugins:
+  - jekyll-spaceship
